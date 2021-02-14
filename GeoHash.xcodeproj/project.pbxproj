@@ -10,6 +10,8 @@
 		322B2A055E0321B204F61F53 /* Pods_GeoHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DE72196F78894B6BD385B2E /* Pods_GeoHash.framework */; };
 		32B6D87FF356F0D973A182B9 /* Pods_GeoHash_GeoHashUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FB6FC29881D73113C1B372D /* Pods_GeoHash_GeoHashUITests.framework */; };
 		8431AB1625C4AD71005086DC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8431AB1525C4AD71005086DC /* Extensions.swift */; };
+		84424A8025C7978D00C6A23F /* Location Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84424A7F25C7978D00C6A23F /* Location Helper.swift */; };
+		84424A8525C7984D00C6A23F /* Setup Default Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84424A8425C7984D00C6A23F /* Setup Default Data.swift */; };
 		84A275D825C46FC100BC6573 /* PickUps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A275D725C46FC100BC6573 /* PickUps.swift */; };
 		84A275F525C47C0400BC6573 /* DateHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A275F425C47C0400BC6573 /* DateHelp.swift */; };
 		84FD230A25C46BA0001B88F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FD230925C46BA0001B88F6 /* AppDelegate.swift */; };
@@ -52,6 +54,8 @@
 		637F84DCD7F05ACB1CC8CF0B /* Pods_GeoHashTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GeoHashTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A7CBC6D8903A43C6E4C3574 /* Pods-GeoHash-GeoHashUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GeoHash-GeoHashUITests.debug.xcconfig"; path = "Target Support Files/Pods-GeoHash-GeoHashUITests/Pods-GeoHash-GeoHashUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		8431AB1525C4AD71005086DC /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		84424A7F25C7978D00C6A23F /* Location Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Location Helper.swift"; sourceTree = "<group>"; };
+		84424A8425C7984D00C6A23F /* Setup Default Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Setup Default Data.swift"; sourceTree = "<group>"; };
 		84A275D725C46FC100BC6573 /* PickUps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUps.swift; sourceTree = "<group>"; };
 		84A275F425C47C0400BC6573 /* DateHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelp.swift; sourceTree = "<group>"; };
 		84FD230625C46BA0001B88F6 /* GeoHash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeoHash.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -99,6 +103,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		84424A8C25C7999800C6A23F /* Database Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				84A275D725C46FC100BC6573 /* PickUps.swift */,
+				84A275F425C47C0400BC6573 /* DateHelp.swift */,
+				8431AB1525C4AD71005086DC /* Extensions.swift */,
+				84424A8425C7984D00C6A23F /* Setup Default Data.swift */,
+				84424A7F25C7978D00C6A23F /* Location Helper.swift */,
+			);
+			path = "Database Helpers";
+			sourceTree = "<group>";
+		};
 		84FD22FD25C46BA0001B88F6 = {
 			isa = PBXGroup;
 			children = (
@@ -126,9 +142,7 @@
 			children = (
 				84FD230F25C46BA0001B88F6 /* Main.storyboard */,
 				84FD230D25C46BA0001B88F6 /* ViewController.swift */,
-				84A275D725C46FC100BC6573 /* PickUps.swift */,
-				84A275F425C47C0400BC6573 /* DateHelp.swift */,
-				8431AB1525C4AD71005086DC /* Extensions.swift */,
+				84424A8C25C7999800C6A23F /* Database Helpers */,
 				84FD230B25C46BA0001B88F6 /* SceneDelegate.swift */,
 				84FD231225C46BA2001B88F6 /* Assets.xcassets */,
 				84FD230925C46BA0001B88F6 /* AppDelegate.swift */,
@@ -420,6 +434,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				84FD230E25C46BA0001B88F6 /* ViewController.swift in Sources */,
+				84424A8525C7984D00C6A23F /* Setup Default Data.swift in Sources */,
+				84424A8025C7978D00C6A23F /* Location Helper.swift in Sources */,
 				8431AB1625C4AD71005086DC /* Extensions.swift in Sources */,
 				84FD230A25C46BA0001B88F6 /* AppDelegate.swift in Sources */,
 				84A275F525C47C0400BC6573 /* DateHelp.swift in Sources */,

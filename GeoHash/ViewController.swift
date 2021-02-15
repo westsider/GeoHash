@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     var index = 0
     var ids = [""]
     let refreshControl = UIRefreshControl()
+    var toMiles = 10.0
     
     @IBOutlet weak var filterBttn: UIButton!
     
@@ -34,6 +35,17 @@ class ViewController: UIViewController {
         print("tasks count \(tasks.count)")
         refreshControl.addTarget(self, action:  #selector(sortArray), for: .valueChanged)
         tableView.refreshControl = refreshControl
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if listener != nil {
+            listener.remove()
+        }
     }
     
     @objc func sortArray() {
@@ -47,7 +59,7 @@ class ViewController: UIViewController {
         //getallDocs(radius: 10 * 1.60934)
         print("tasks count \(tasks.count)")
         //tableView.reloadData()
-        setUp.autoPopulatePickups(ownerFullName: "Jen Poyer +", street: "1204 Mira Mar Ave", city: "Long Beach", state: "CA", zip: "90301")
+        //setUp.autoPopulatePickups(ownerFullName: "Jen Poyer +", street: "1204 Mira Mar Ave", city: "Long Beach", state: "CA", zip: "90301")
     }
     
     // filter to 120 miles
@@ -73,82 +85,83 @@ class ViewController: UIViewController {
         let queryBounds = GFUtils.queryBounds(forLocation: center, withRadius: radiusInKilometers)
         let queries = queryBounds.compactMap { (any) -> Query? in
             guard let bound = any as? GFGeoQueryBounds else { return nil }
-           
             return db.collection("pickups")
                 .order(by: "geohash")
                 .start(at: [bound.startValue])
                 .end(at: [bound.endValue])
         }
-
-        // Collect all the query results together into a single list
+        
         func getDocumentsCompletion(snapshot: QuerySnapshot?, error: Error?) -> () {
             print("#3 getDocumentsCompletion - tasks count \(tasks.count)")
-            guard let documents = snapshot?.documents else {
-                print("Unable to fetch snapshot data. \(String(describing: error))")
-                return
-            }
-            
-            for document in documents {
-                let lat = document.data()["lat"] as? Double ?? 0
-                let lng = document.data()["lng"] as? Double ?? 0
-                let ownerAddress = document.data()["ownerAddress"] as? String ?? "no address"
-                let id = document.data()["id"] as? String ?? "no id"
-                let coordinates = CLLocation(latitude: lat, longitude: lng)
-                let centerPoint = CLLocation(latitude: center.latitude, longitude: center.longitude)
-
-                // We have to filter out a few false positives due to GeoHash accuracy, but
-                // most will match
-                let distance = GFUtils.distance(from: centerPoint, to: coordinates)
-                let toMiles = distance * 0.000621371
-                let milesToString = String(format: "%.01f", toMiles)
-                print("ownerAddress: \(ownerAddress), distance: \(milesToString) \tlat: \(lat), lng: \(lng) id: \(id)")
-                
-                // when i delete a document or add adoc
-                
-                // looking for duplicate entries
-                let nextPickup = (address: "\(ownerAddress)", distance: "\(milesToString) miles", id: id)
-                print("checking id: \(id) with id list of \(ids.count)")
-                if ids.contains(id) {
-                    guard let index = ids.firstIndex(of: id) else { return }
-                    if index > 0 {
-                    print("\t------> found dupe id \(id) at index \(index - 1) and thats \(tasks[index - 1].id)")
-                    tasks[index - 1] = nextPickup
-                    }
-                } else {
-                    if toMiles <= miles[index] {
-                        tasks.append(nextPickup)
-                    }
+            snapshot?.documentChanges.forEach({ (change) in
+                let data = change.document.data()
+                let newItem = parseData(data: data)
+                print("change type: \(change.type.rawValue)  \(change.type.hashValue)")
+                switch change.type {
+                    case .added:
+                        documentAdded(change: change, newItem: newItem)
+                    case .modified:
+                        print("modified doc")
+                    case .removed:
+                        print("removed doc")
                 }
-                ids.append(id)
-                if tasks.count > 0 {
-                    tableView.reloadData()
-                }
-            }
+            })
             tableView.reloadData()
         }
-
-        // After all callbacks have executed, matchingDocs contains the result. Note that this
-        // sample does not demonstrate how to wait on all callbacks to complete.
-        print("#1 for query in queries")
-        tasks.removeAll()
-        print("running \(queries.count) queries")
+        print("#1 for query in queries running \(queries.count) queries")
         
         for query in queries {
-            query.addSnapshotListener { (snap, error) in
+            listener = query.addSnapshotListener { (snap, error) in
                 if let error = error {
                     print(error.localizedDescription)
                 }
-                guard let documents = snap?.documents else {
-                    print("Unable to fetch snapshot data. \(String(describing: error))")
-                    return
-                }
-                print("#2 *** Updated 2 ***  listener found \(documents.count)")
                 query.getDocuments(completion: getDocumentsCompletion)
             }
         }
         print("1A tasks count \(tasks.count)")
     }
     
+    func parseData(data: [String:Any]) -> (address: String, distance: String, id: String) {
+        let center = CLLocationCoordinate2D(latitude: 33.9742268, longitude: -118.3947792)
+        let lat = data["lat"] as? Double ?? 0
+        let lng = data["lng"] as? Double ?? 0
+        let ownerAddress = data["ownerAddress"] as? String ?? "no address"
+        let id = data["id"] as? String ?? "no id"
+        let coordinates = CLLocation(latitude: lat, longitude: lng)
+        let centerPoint = CLLocation(latitude: center.latitude, longitude: center.longitude)
+        let distance = GFUtils.distance(from: centerPoint, to: coordinates)
+        toMiles = distance * 0.000621371
+        let milesToString = String(format: "%.01f", toMiles)
+        return (address: "\(ownerAddress)", distance: "\(milesToString) miles", id: id)
+    }
+    func documentAdded(change: DocumentChange, newItem: (address: String, distance: String, id: String) ) {
+    
+        let newIndex = Int(change.newIndex)
+        //let toMiles = Double(newItem.distance) ?? 10.0
+        print("Added Doc: \(newIndex)  ownerAddress: \(newItem.address), distance: \(newItem.distance) id: \(newItem.id)")
+        //print("Comparing this distance \(toMiles) to max distance \(miles[index]) ")
+        if toMiles <= miles[index] {
+            tasks.append(newItem)
+        }
+    }
+    
+    //                if ids.contains(id) {
+    //                    guard let index = ids.firstIndex(of: id) else { return }
+    //                    if index > 0 {
+    //                    print("\t------> found dupe id \(id) at index \(index - 1) and thats \(tasks[index - 1].id)")
+    //                    tasks[index - 1] = nextPickup
+    //                    }
+    //                } else {
+    //                    if toMiles <= miles[index] {
+
+    
+    func documentModified(){
+        print("\t*** Modified ***")
+    }
+    
+    func documentRemoved(){
+        print("\t*** Removed ***")
+    }
 }
 
 extension ViewController : UITableViewDataSource, UITableViewDelegate {

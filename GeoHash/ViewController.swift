@@ -110,8 +110,10 @@ class ViewController: UIViewController {
                 print("checking id: \(id) with id list of \(ids.count)")
                 if ids.contains(id) {
                     guard let index = ids.firstIndex(of: id) else { return }
+                    if index > 0 {
                     print("\t------> found dupe id \(id) at index \(index - 1) and thats \(tasks[index - 1].id)")
                     tasks[index - 1] = nextPickup
+                    }
                 } else {
                     if toMiles <= miles[index] {
                         tasks.append(nextPickup)
@@ -130,10 +132,9 @@ class ViewController: UIViewController {
         print("#1 for query in queries")
         tasks.removeAll()
         print("running \(queries.count) queries")
+        
         for query in queries {
-            
             query.addSnapshotListener { (snap, error) in
-                
                 if let error = error {
                     print(error.localizedDescription)
                 }
@@ -141,11 +142,9 @@ class ViewController: UIViewController {
                     print("Unable to fetch snapshot data. \(String(describing: error))")
                     return
                 }
-                
                 print("#2 *** Updated 2 ***  listener found \(documents.count)")
                 query.getDocuments(completion: getDocumentsCompletion)
             }
-            
         }
         print("1A tasks count \(tasks.count)")
     }

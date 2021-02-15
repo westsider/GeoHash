@@ -62,6 +62,8 @@ class ViewController: UIViewController {
         filterBttn.setTitle("\(miles[index]) miles", for: .normal)
     }
 
+    // hey fuck you!
+    
     // Listener for firebase pickups. I have to filter the resutlts because it get called twice and I don lknpw why
     // MARK : - TODO - refactor wthout the tasks filter
     func getallDocs(radius: Double) {

@@ -91,23 +91,23 @@ class ViewController: UIViewController {
                 .end(at: [bound.endValue])
         }
         
-        func getDocumentsCompletion(snapshot: QuerySnapshot?, error: Error?) -> () {
-            print("#3 getDocumentsCompletion - tasks count \(tasks.count)")
-            snapshot?.documentChanges.forEach({ (change) in
-                let data = change.document.data()
-                let newItem = parseData(data: data)
-                print("change type: \(change.type.rawValue)  \(change.type.hashValue)")
-                switch change.type {
-                    case .added:
-                        documentAdded(change: change, newItem: newItem)
-                    case .modified:
-                        print("modified doc")
-                    case .removed:
-                        print("removed doc")
-                }
-            })
-            tableView.reloadData()
-        }
+//        func getDocumentsCompletion(snapshot: QuerySnapshot?, error: Error?) -> () {
+//            print("#3 getDocumentsCompletion - tasks count \(tasks.count)")
+//            snapshot?.documentChanges.forEach({ (change) in
+//                let data = change.document.data()
+//                let newItem = parseData(data: data)
+//                print("change type: \(change.type.rawValue)  \(change.type.hashValue)")
+//                switch change.type {
+//                    case .added:
+//                        documentAdded(change: change, newItem: newItem)
+//                    case .modified:
+//                        print("modified doc")
+//                    case .removed:
+//                        print("removed doc")
+//                }
+//            })
+//            tableView.reloadData()
+//        }
         print("#1 for query in queries running \(queries.count) queries")
         
         for query in queries {
@@ -115,7 +115,22 @@ class ViewController: UIViewController {
                 if let error = error {
                     print(error.localizedDescription)
                 }
-                query.getDocuments(completion: getDocumentsCompletion)
+                //queries[1].getDocuments(completion: getDocumentsCompletion)
+                
+                snap?.documentChanges.forEach({ (change) in
+                    let data = change.document.data()
+                    let newItem = self.parseData(data: data)
+                    print("change type: \(change.type.rawValue)  \(change.type.hashValue)")
+                    switch change.type {
+                        case .added:
+                            self.documentAdded(change: change, newItem: newItem)
+                        case .modified:
+                            print("modified doc")
+                        case .removed:
+                            print("removed doc")
+                    }
+                })
+                self.tableView.reloadData()
             }
         }
         print("1A tasks count \(tasks.count)")

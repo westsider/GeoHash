@@ -69,15 +69,11 @@ class ViewController: UIViewController {
         if index > miles.count - 1 { index = 0}
         let convertMilesToMeters = (miles[index] * 1609.34)
         tasks.removeAll()
-        
         getallDocs(radius: convertMilesToMeters)
         print("GETTING PICKUPS WITHIN \(miles[index]) miles \tFilter \(convertMilesToMeters) meters vs 1,200,200")
         filterBttn.setTitle("\(miles[index]) miles", for: .normal)
     }
 
-    
-    // Listener for firebase pickups. I have to filter the resutlts because it get called twice and I don lknpw why
-    // MARK : - TODO - refactor wthout the tasks filter
     func getallDocs(radius: Double) {
 
         let center = CLLocationCoordinate2D(latitude: 33.9742268, longitude: -118.3947792)
@@ -90,24 +86,6 @@ class ViewController: UIViewController {
                 .start(at: [bound.startValue])
                 .end(at: [bound.endValue])
         }
-        
-//        func getDocumentsCompletion(snapshot: QuerySnapshot?, error: Error?) -> () {
-//            print("#3 getDocumentsCompletion - tasks count \(tasks.count)")
-//            snapshot?.documentChanges.forEach({ (change) in
-//                let data = change.document.data()
-//                let newItem = parseData(data: data)
-//                print("change type: \(change.type.rawValue)  \(change.type.hashValue)")
-//                switch change.type {
-//                    case .added:
-//                        documentAdded(change: change, newItem: newItem)
-//                    case .modified:
-//                        print("modified doc")
-//                    case .removed:
-//                        print("removed doc")
-//                }
-//            })
-//            tableView.reloadData()
-//        }
         print("#1 for query in queries running \(queries.count) queries")
         
         for query in queries {
@@ -115,7 +93,6 @@ class ViewController: UIViewController {
                 if let error = error {
                     print(error.localizedDescription)
                 }
-                //queries[1].getDocuments(completion: getDocumentsCompletion)
                 
                 snap?.documentChanges.forEach({ (change) in
                     let data = change.document.data()
@@ -125,7 +102,7 @@ class ViewController: UIViewController {
                         case .added:
                             self.documentAdded(change: change, newItem: newItem)
                         case .modified:
-                            self.documentModified(change: change)
+                            self.documentModified(change: change, item: newItem)
                         case .removed:
                             self.documentRemoved(change: change)
                     }
@@ -149,6 +126,8 @@ class ViewController: UIViewController {
         let milesToString = String(format: "%.01f", toMiles)
         return (address: "\(ownerAddress)", distance: "\(milesToString) miles", id: id)
     }
+    
+    // add pickup didnt work
     func documentAdded(change: DocumentChange, newItem: (address: String, distance: String, id: String) ) {
     
         let newIndex = Int(change.newIndex)
@@ -158,11 +137,21 @@ class ViewController: UIViewController {
         }
     }
     
-    func documentModified(change: DocumentChange){
+    func documentModified(change: DocumentChange, item: (address: String, distance: String, id: String)){
         print("\t*** Modified ***")
         let oldIndex = Int(change.oldIndex)
         let newIndex = Int(change.newIndex)
-        tasks.remove(at: oldIndex)
+        if change.newIndex == change.oldIndex {
+            let indexPath = IndexPath(item: newIndex, section: 0)
+            tasks[newIndex] = item
+            tableView.reloadRows(at: [indexPath], with: .left)
+        } else {
+            tasks.remove(at: oldIndex)
+            tasks.insert(item, at: newIndex)
+            let indexPathOld = IndexPath(item: oldIndex, section: 0)
+            let indexPathNew = IndexPath(item: newIndex, section: 0)
+            tableView.moveRow(at: indexPathOld, to: indexPathNew)
+        }
     }
     
     func documentRemoved(change: DocumentChange){

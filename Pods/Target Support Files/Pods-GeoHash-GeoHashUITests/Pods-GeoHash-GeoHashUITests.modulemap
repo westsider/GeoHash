@@ -1,0 +1,6 @@
+framework module Pods_GeoHash_GeoHashUITests {
+  umbrella header "Pods-GeoHash-GeoHashUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -59,7 +59,7 @@ class ViewController: UIViewController {
         //getallDocs(radius: 10 * 1.60934)
         print("tasks count \(tasks.count)")
         //tableView.reloadData()
-        //setUp.autoPopulatePickups(ownerFullName: "Jen Poyer +", street: "1204 Mira Mar Ave", city: "Long Beach", state: "CA", zip: "90301")
+        setUp.autoPopulatePickups(ownerFullName: "Jen Poyer +", street: "1204 Mira Mar Ave", city: "Long Beach", state: "CA", zip: "90301")
     }
     
     // filter to 120 miles
@@ -125,9 +125,9 @@ class ViewController: UIViewController {
                         case .added:
                             self.documentAdded(change: change, newItem: newItem)
                         case .modified:
-                            print("modified doc")
+                            self.documentModified(change: change)
                         case .removed:
-                            print("removed doc")
+                            self.documentRemoved(change: change)
                     }
                 })
                 self.tableView.reloadData()
@@ -152,30 +152,25 @@ class ViewController: UIViewController {
     func documentAdded(change: DocumentChange, newItem: (address: String, distance: String, id: String) ) {
     
         let newIndex = Int(change.newIndex)
-        //let toMiles = Double(newItem.distance) ?? 10.0
         print("Added Doc: \(newIndex)  ownerAddress: \(newItem.address), distance: \(newItem.distance) id: \(newItem.id)")
-        //print("Comparing this distance \(toMiles) to max distance \(miles[index]) ")
         if toMiles <= miles[index] {
             tasks.append(newItem)
         }
     }
     
-    //                if ids.contains(id) {
-    //                    guard let index = ids.firstIndex(of: id) else { return }
-    //                    if index > 0 {
-    //                    print("\t------> found dupe id \(id) at index \(index - 1) and thats \(tasks[index - 1].id)")
-    //                    tasks[index - 1] = nextPickup
-    //                    }
-    //                } else {
-    //                    if toMiles <= miles[index] {
-
-    
-    func documentModified(){
+    func documentModified(change: DocumentChange){
         print("\t*** Modified ***")
+        let oldIndex = Int(change.oldIndex)
+        let newIndex = Int(change.newIndex)
+        tasks.remove(at: oldIndex)
     }
     
-    func documentRemoved(){
+    func documentRemoved(change: DocumentChange){
         print("\t*** Removed ***")
+        let oldIndex = Int(change.oldIndex)
+        tasks.remove(at: oldIndex)
+        let indexPath = IndexPath(item: oldIndex, section: 0)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
     }
 }
 
@@ -192,6 +187,13 @@ extension ViewController : UITableViewDataSource, UITableViewDelegate {
         }
         return UITableViewCell()
     }
-    
-    
 }
+
+//                if ids.contains(id) {
+//                    guard let index = ids.firstIndex(of: id) else { return }
+//                    if index > 0 {
+//                    print("\t------> found dupe id \(id) at index \(index - 1) and thats \(tasks[index - 1].id)")
+//                    tasks[index - 1] = nextPickup
+//                    }
+//                } else {
+//                    if toMiles <= miles[index] {

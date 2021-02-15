@@ -12,7 +12,7 @@ import GeoFire
 
 class ViewController: UIViewController {
 
-    let db = Firestore.firestore()
+    var db : Firestore!
     var listener: ListenerRegistration!
     let setUp = SetUpDefault()
     var tasks:[(address: String, distance: String, id: String)] = []
@@ -27,6 +27,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        db = Firestore.firestore()
         getallDocs(radius: 2200000)
         index = miles.count - 1
         filterBttn.setTitle("\(miles[index]) miles", for: .normal)
@@ -62,7 +63,6 @@ class ViewController: UIViewController {
         filterBttn.setTitle("\(miles[index]) miles", for: .normal)
     }
 
-    // hey fuck you!
     
     // Listener for firebase pickups. I have to filter the resutlts because it get called twice and I don lknpw why
     // MARK : - TODO - refactor wthout the tasks filter
@@ -113,7 +113,9 @@ class ViewController: UIViewController {
                     print("\t------> found dupe id \(id) at index \(index - 1) and thats \(tasks[index - 1].id)")
                     tasks[index - 1] = nextPickup
                 } else {
-                    tasks.append(nextPickup)
+                    if toMiles <= miles[index] {
+                        tasks.append(nextPickup)
+                    }
                 }
                 ids.append(id)
                 if tasks.count > 0 {
